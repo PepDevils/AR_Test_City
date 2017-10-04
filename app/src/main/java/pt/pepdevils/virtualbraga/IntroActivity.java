@@ -3,7 +3,6 @@ package pt.pepdevils.virtualbraga;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;

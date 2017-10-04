@@ -3,6 +3,7 @@ var World = {
 	// true once data was fetched
 	initiallyLoadedData: false,
 
+
 	// different POI-Marker assets
 	markerDrawable_idle: null,
 	markerDrawable_selected: null,
@@ -106,6 +107,8 @@ var World = {
 				"id": (i + 1),
 				"longitude": (centerPointLongitude + (Math.random() / 5 - 0.1)),
 				"latitude": (centerPointLatitude + (Math.random() / 5 - 0.1)),
+				/*"longitude": "",
+				"latitude": "",*/
 				"description": ("This is the description of POI#" + (i + 1)),
 				"altitude": "100.0",
 				"name": ("POI#" + (i + 1))
@@ -125,3 +128,5 @@ AR.context.onLocationChanged = World.locationChanged;
 	To detect clicks where no drawable was hit set a custom function on AR.context.onScreenClick where the currently selected marker is deselected.
 */
 AR.context.onScreenClick = World.onScreenClick;
+
+AR.logger.activateDebugMode();

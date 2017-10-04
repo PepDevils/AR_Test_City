@@ -11,8 +11,10 @@
         android:layout_height="match_parent"
         android:layout_margin="8dp"
         android:gravity="center"
-        android:clickable="false"
+
         android:keepScreenOn="true"
         android:padding="8dp" />
+
+<!--    android:clickable="false"-->
 
 </FrameLayout>
