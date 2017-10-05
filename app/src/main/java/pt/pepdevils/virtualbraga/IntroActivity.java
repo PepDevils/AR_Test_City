@@ -4,22 +4,21 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.widget.Toast;
+import android.util.Log;
 
-import com.wikitude.architect.ArchitectStartupConfiguration;
-import com.wikitude.architect.ArchitectView;
-
-import java.io.IOException;
-
+import gl.GL1Renderer;
+import gl.GLFactory;
+import system.ArActivity;
+import system.DefaultARSetup;
+import worldData.World;
 
 public class IntroActivity extends AppCompatActivity {
 
-    private static final int CALLBACK_NUMBER = 21;
-    private ArchitectView architectView;
+    final static int CALLBACK_NUMBER = 21;
+    final static String TAG = "IntroActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,22 +31,14 @@ public class IntroActivity extends AppCompatActivity {
             int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
             if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
                 //PERMISSION GRANTED
-                WikitudeViewAndConfig();
+                StartDroidAr();
             } else {
                 //PERMISSION not GRANTED
                 requestPermissions(new String[]{Manifest.permission.CAMERA},CALLBACK_NUMBER);
             }
         } else {
-            WikitudeViewAndConfig();
+            StartDroidAr();
         }
-
-
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        this.architectView.onResume();
     }
 
     @Override
@@ -55,42 +46,21 @@ public class IntroActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if(requestCode == CALLBACK_NUMBER){
-            Toast.makeText(this, "PERMISSION GRANTED", Toast.LENGTH_SHORT).show();
+            Log.i(TAG, "PERMISSION FOR CAMERA GRANTED");
+            StartDroidAr();
         }else{
-            Toast.makeText(this, "PERMISSION NOT", Toast.LENGTH_SHORT).show();
+            Log.i(TAG, "PERMISSION FOR NOT CAMERA GRANTED");
+            //todo: criar um pop up para e fechar a aplicação...
         }
-
     }
 
-    @Override
-    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        architectView.onPostCreate();
-        try {
-            architectView.load(WikitudeHelper.URL);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+    private void StartDroidAr(){
+        ArActivity.startWithSetup(IntroActivity.this, new DefaultARSetup() {
+            @Override
+            public void addObjectsTo(GL1Renderer renderer, World world, GLFactory objectFactory) {
+                world.add(objectFactory.newHexGroupTest(null));
+            }
+        });
     }
 
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        architectView.onPause();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        architectView.onDestroy();
-    }
-
-    private void WikitudeViewAndConfig() {
-        this.architectView = (ArchitectView) findViewById(R.id.architectView);
-        final ArchitectStartupConfiguration config = new ArchitectStartupConfiguration();
-        config.setLicenseKey(WikitudeHelper.WIKITUDE_LICENSE);
-        this.architectView.onCreate(config);
-    }
 }
