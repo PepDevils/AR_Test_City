@@ -3,18 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#0099cc"
-    tools:context="pt.pepdevils.virtualbraga.IntroActivity">
+    tools:context="pt.pepdevils.virtualbraga.activities.IntroActivity">
 
-    <com.wikitude.architect.ArchitectView
-        android:id="@+id/architectView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_margin="8dp"
-        android:gravity="center"
 
-        android:keepScreenOn="true"
-        android:padding="8dp" />
-
-<!--    android:clickable="false"-->
 
 </FrameLayout>
