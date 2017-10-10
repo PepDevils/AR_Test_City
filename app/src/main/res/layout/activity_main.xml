@@ -38,20 +38,21 @@
             tools:ignore="UselessParent">
 
             <Button
-                android:id="@+id/mixare"
+                android:id="@+id/camera"
                 style="?metaButtonBarButtonStyle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="MIXARE" />
+                android:text="CAMERA" />
 
             <Button
-                android:id="@+id/droidar"
+                android:id="@+id/map"
                 style="?metaButtonBarButtonStyle"
                 android:layout_width="0dp"
+                android:enabled="true"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="DROIDAR" />
+                android:text="MAP" />
 
         </LinearLayout>
     </FrameLayout>

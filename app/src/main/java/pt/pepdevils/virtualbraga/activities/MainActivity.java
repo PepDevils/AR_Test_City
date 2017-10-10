@@ -101,14 +101,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        findViewById(R.id.mixare).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.camera).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(MainActivity.this, CameraActivity.class);
                 startActivity(i);
             }
         });
-        findViewById(R.id.droidar).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.map).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(MainActivity.this, IntroActivity.class);
