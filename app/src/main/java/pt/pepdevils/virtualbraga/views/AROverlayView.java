@@ -1,12 +1,15 @@
 package pt.pepdevils.virtualbraga.views;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.location.Location;
 import android.opengl.Matrix;
+import android.util.Log;
 import android.view.View;
 
 import java.util.ArrayList;
@@ -42,7 +45,7 @@ public class AROverlayView extends View {
             add(new ARPoint("Hospital", 41.567838, -8.399068, 0));
         }};
 
-        City braga = new City("braga",arPoints);
+        City braga = new City("braga", arPoints);
         cities = new ArrayList<>();
         cities.add(braga);
 
@@ -54,7 +57,7 @@ public class AROverlayView extends View {
         this.invalidate();
     }
 
-    public void updateCurrentLocation(Location currentLocation){
+    public void updateCurrentLocation(Location currentLocation) {
         this.currentLocation = currentLocation;
         this.invalidate();
     }
@@ -78,9 +81,9 @@ public class AROverlayView extends View {
 
 
         //para cada cidade
-        for (City city:cities) {
+        for (City city : cities) {
 
-            for (int i = 0; i < city.getPoints().size(); i ++) {
+            for (int i = 0; i < city.getPoints().size(); i++) {
                 float[] currentLocationInECEF = LocationHelper.WSG84toECEF(currentLocation);
                 float[] pointInECEF = LocationHelper.WSG84toECEF(city.getPoints().get(i).getLocation());
                 float[] pointInENU = LocationHelper.ECEFtoENU(currentLocation, currentLocationInECEF, pointInECEF);
@@ -91,16 +94,73 @@ public class AROverlayView extends View {
                 // cameraCoordinateVector[2] is z, that always less than 0 to display on right position
                 // if z > 0, the point will display on the opposite
                 if (cameraCoordinateVector[2] < 0) {
-                    float x  = (0.5f + cameraCoordinateVector[0]/cameraCoordinateVector[3]) * canvas.getWidth();
-                    float y = (0.5f - cameraCoordinateVector[1]/cameraCoordinateVector[3]) * canvas.getHeight();
+                    float x = (0.5f + cameraCoordinateVector[0] / cameraCoordinateVector[3]) * canvas.getWidth();
+                    float y = (0.5f - cameraCoordinateVector[1] / cameraCoordinateVector[3]) * canvas.getHeight();
 
+                    //saber a distancia entre o meu local e o ponto
+                    String distance = DistanceFromPoint(currentLocation, city.getPoints().get(i).getLocation());
+
+                    //desenha o circulo e escreve o nome
                     canvas.drawCircle(x, y, radius, paint);
-                    canvas.drawText(city.getPoints().get(i).getName(), x - (30 * city.getPoints().get(i).getName().length() / 2), y - 80, paint);
+                    canvas.drawText(city.getPoints().get(i).getName() + "/n" + distance, x - (30 * city.getPoints().get(i).getName().length() / 2), y - 80, paint);
+
+                    //todo: aplicar o exemplo abaixo no nosso texto, remover a linha assima ou modificar
+                    //escrever mais texto upor exemplo a distancia entre objectos
+                    /*
+                    TextPaint mTextPaint=new TextPaint();
+                    StaticLayout mTextLayout = new StaticLayout("my text\nNext line is very long text that does not definitely fit in a single line on an android device. This will show you how!", mTextPaint, canvas.getWidth(), Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
+
+                    canvas.save();
+// calculate x and y position where your text will be placed
+
+                    textX = 100;
+                    textY = 100;
+
+                    canvas.translate(textX, textY);
+                    mTextLayout.draw(canvas);
+                    canvas.restore();
+                    */
+
+                    //para substituir o ponto branco por uma imagem
+        /*
+         Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), android.R.drawable.ic_menu_help);
+                    // example: canvas.drawText(text, x, y, imgPaint);
+                    canvas.drawBitmap(bitmap, x, y, paint);
+        * */
+
+
+
+
                 }
             }
 
         }
 
+    }
+
+    private String DistanceFromPoint(Location currentLocation, Location location) {
+
+        int Radius = 6371;// radius of earth in Km
+
+        StringBuilder tmp = new StringBuilder();
+        String aux;
+
+        double dLon = Math.toRadians(location.getLongitude() - currentLocation.getLongitude());
+        double dLat = Math.toRadians(location.getLatitude() - currentLocation.getLatitude());
+
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                + Math.cos(Math.toRadians(currentLocation.getLatitude()))
+                * Math.cos(Math.toRadians(location.getLatitude())) * Math.sin(dLon / 2)
+                * Math.sin(dLon / 2);
+        double c = 2 * Math.asin(Math.sqrt(a));
+        double valueResult = Radius * c;
+        double km = valueResult / 1;
+        double m = km / 1000;
+        aux = String.valueOf(((int) m));
+        tmp.append(aux);
+        tmp.append(" metros");
+        Log.i("AROVERlayView", "DistanceFromPoint: " + tmp.toString());
+        return tmp.toString();
     }
 
 }
