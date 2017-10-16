@@ -9,6 +9,9 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.location.Location;
 import android.opengl.Matrix;
+import android.text.Layout;
+import android.text.StaticLayout;
+import android.text.TextPaint;
 import android.util.Log;
 import android.view.View;
 
@@ -102,33 +105,24 @@ public class AROverlayView extends View {
 
                     //desenha o circulo e escreve o nome
                     canvas.drawCircle(x, y, radius, paint);
-                    canvas.drawText(city.getPoints().get(i).getName() + "/n" + distance, x - (30 * city.getPoints().get(i).getName().length() / 2), y - 80, paint);
+                    float textX = x - (30 * city.getPoints().get(i).getName().length() / 2);
+                    float textY = y + 90;
+                    float textYparagrafh = textY + 80;
+                    float textXparagrafh = x - (30 * distance.length() / 2);
 
-                    //todo: aplicar o exemplo abaixo no nosso texto, remover a linha assima ou modificar
-                    //escrever mais texto upor exemplo a distancia entre objectos
-                    /*
-                    TextPaint mTextPaint=new TextPaint();
-                    StaticLayout mTextLayout = new StaticLayout("my text\nNext line is very long text that does not definitely fit in a single line on an android device. This will show you how!", mTextPaint, canvas.getWidth(), Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
+                    canvas.drawText(city.getPoints().get(i).getName(), textX, textY, paint);
+                    canvas.drawText(distance, textXparagrafh, textYparagrafh, paint);
 
-                    canvas.save();
-// calculate x and y position where your text will be placed
-
-                    textX = 100;
-                    textY = 100;
-
-                    canvas.translate(textX, textY);
-                    mTextLayout.draw(canvas);
-                    canvas.restore();
-                    */
 
                     //para substituir o ponto branco por uma imagem
-        /*
-         Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), android.R.drawable.ic_menu_help);
+
+                    /*todo: ajustar a posiçao do icon no lugar exato do circulo branco
+                    depois disso eliminar o ponto branco
+                    fazer uma estrutura em que o ARPoint te uma categoria e essa categoria corresponde a um icon
+                    */
+                    Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), android.R.drawable.ic_menu_help);
                     // example: canvas.drawText(text, x, y, imgPaint);
                     canvas.drawBitmap(bitmap, x, y, paint);
-        * */
-
-
 
 
                 }
@@ -139,6 +133,8 @@ public class AROverlayView extends View {
     }
 
     private String DistanceFromPoint(Location currentLocation, Location location) {
+
+        //todo: distancia sempre zero verificar
 
         int Radius = 6371;// radius of earth in Km
 
