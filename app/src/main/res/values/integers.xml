@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--radius of earth in Km-->
+    <integer name="radius_of_earth">6371</integer>
+    <integer name="CameraTextSize">60</integer>
+    <integer name="CameraWhiteDotRadius">30</integer>
+</resources>

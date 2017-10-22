@@ -18,6 +18,7 @@ import android.view.View;
 import java.util.ArrayList;
 import java.util.List;
 
+import pt.pepdevils.virtualbraga.R;
 import pt.pepdevils.virtualbraga.helper.LocationHelper;
 import pt.pepdevils.virtualbraga.model.ARPoint;
 import pt.pepdevils.virtualbraga.model.City;
@@ -75,12 +76,12 @@ public class AROverlayView extends View {
         }
 
         //defenições para o desenho dos icones para cada localização, (ponto branco de raio 30px)
-        final int radius = 30;
+        final int radius = getResources().getInteger(R.integer.CameraWhiteDotRadius);
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setStyle(Paint.Style.FILL);
         paint.setColor(Color.WHITE);
         paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
-        paint.setTextSize(60);
+        paint.setTextSize(getResources().getInteger(R.integer.CameraTextSize));
 
 
         //para cada cidade
@@ -97,6 +98,7 @@ public class AROverlayView extends View {
                 // cameraCoordinateVector[2] is z, that always less than 0 to display on right position
                 // if z > 0, the point will display on the opposite
                 if (cameraCoordinateVector[2] < 0) {
+                    // x e y paara circulo branco 0.5f 0.5f
                     float x = (0.5f + cameraCoordinateVector[0] / cameraCoordinateVector[3]) * canvas.getWidth();
                     float y = (0.5f - cameraCoordinateVector[1] / cameraCoordinateVector[3]) * canvas.getHeight();
 
@@ -120,8 +122,29 @@ public class AROverlayView extends View {
                     depois disso eliminar o ponto branco
                     fazer uma estrutura em que o ARPoint te uma categoria e essa categoria corresponde a um icon
                     */
-                    Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), android.R.drawable.ic_menu_help);
+                    Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), android.R.drawable.ic_delete); //ic_menu_help
                     // example: canvas.drawText(text, x, y, imgPaint);
+
+                    float ffw = bitmap.getWidth();
+                    float ffh = bitmap.getHeight();
+
+                    ffw = ffw / 2; //relação n funciona, n centra o icone, perceber pk
+                    ffw = ffw / 100;
+
+                    ffh = ffh / 2;
+                    ffh = ffh / 100;
+
+
+                    Log.e("PEPE", "onDraw: " + "ffw: " + ffw + "  ffh: " + ffh);
+                    Log.e("PEPE", "Density Canvas: " + getResources().getDisplayMetrics().density);
+                    //x e y para bitmap de 96px xxhdpi(3)(480) - verificar varios dispositivos
+                    //todo: perceber se é so neste dispositivo, ou qual a relação com estes numeros
+                    ffw = 0.456f;
+                    ffh = 0.47f;
+
+
+                    x = (ffw + cameraCoordinateVector[0] / cameraCoordinateVector[3]) * canvas.getWidth();
+                    y = (ffh - cameraCoordinateVector[1] / cameraCoordinateVector[3]) * canvas.getHeight();
                     canvas.drawBitmap(bitmap, x, y, paint);
 
 
@@ -134,9 +157,9 @@ public class AROverlayView extends View {
 
     private String DistanceFromPoint(Location currentLocation, Location location) {
 
-        //todo: distancia sempre zero verificar
-
-        int Radius = 6371;// radius of earth in Km
+        //int Radius = 6371;// radius of earth in Km 6371
+        int Radius = (int) getResources().getInteger(R.integer.radius_of_earth);
+        String met = getResources().getString(R.string.m);
 
         StringBuilder tmp = new StringBuilder();
         String aux;
@@ -148,14 +171,15 @@ public class AROverlayView extends View {
                 + Math.cos(Math.toRadians(currentLocation.getLatitude()))
                 * Math.cos(Math.toRadians(location.getLatitude())) * Math.sin(dLon / 2)
                 * Math.sin(dLon / 2);
+
         double c = 2 * Math.asin(Math.sqrt(a));
-        double valueResult = Radius * c;
-        double km = valueResult / 1;
-        double m = km / 1000;
+        double km = Radius * c;
+        double m = km * 1000;
+
         aux = String.valueOf(((int) m));
         tmp.append(aux);
-        tmp.append(" metros");
-        Log.i("AROVERlayView", "DistanceFromPoint: " + tmp.toString());
+        tmp.append(" " + met);
+
         return tmp.toString();
     }
 
