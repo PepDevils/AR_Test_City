@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.1"
+    buildToolsVersion '26.0.2'
     //compileOptions.encoding = "ISO-8859-1"
     defaultConfig {
         applicationId "pt.pepdevils.virtualbraga"
@@ -30,6 +30,9 @@ dependencies {
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support:support-v4:25.3.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
+
+    //para gravar objectos como json em sharedpreferens
+    compile 'com.google.code.gson:gson:2.2.4'
    // testCompile 'junit:junit:4.12'
 
     //https://github.com/dat-ng/ar-location-based-android

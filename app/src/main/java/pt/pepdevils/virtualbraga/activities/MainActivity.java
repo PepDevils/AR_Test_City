@@ -9,37 +9,27 @@ import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
 
+import java.util.ArrayList;
+
 import pt.pepdevils.virtualbraga.R;
+import pt.pepdevils.virtualbraga.helper.Constants;
+import pt.pepdevils.virtualbraga.helper.PreferencesHelper;
+import pt.pepdevils.virtualbraga.model.ARPoint;
+import pt.pepdevils.virtualbraga.model.City;
 
 public class MainActivity extends AppCompatActivity {
-    /**
-     * Whether or not the system UI should be auto-hidden after
-     * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
-     */
+
     private static final boolean AUTO_HIDE = true;
-
-    /**
-     * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
-     * user interaction before hiding the system UI.
-     */
     private static final int AUTO_HIDE_DELAY_MILLIS = 3000;
-
-    /**
-     * Some older devices needs a small delay between UI widget updates
-     * and a change of the status and navigation bar.
-     */
     private static final int UI_ANIMATION_DELAY = 300;
     private final Handler mHideHandler = new Handler();
     private View mContentView;
+
     private final Runnable mHidePart2Runnable = new Runnable() {
         @SuppressLint("InlinedApi")
         @Override
         public void run() {
-            // Delayed removal of status and navigation bar
 
-            // Note that some of these constants are new as of API 16 (Jelly Bean)
-            // and API 19 (KitKat). It is safe to use them, as they are inlined
-            // at compile-time and do nothing on earlier devices.
             mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
                     | View.SYSTEM_UI_FLAG_FULLSCREEN
                     | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
@@ -52,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
     private final Runnable mShowPart2Runnable = new Runnable() {
         @Override
         public void run() {
-            // Delayed display of UI elements
+
             ActionBar actionBar = getSupportActionBar();
             if (actionBar != null) {
                 actionBar.show();
@@ -67,12 +57,8 @@ public class MainActivity extends AppCompatActivity {
             hide();
         }
     };
-    /**
-     * Touch listener to use for in-layout UI controls to delay hiding the
-     * system UI. This is to prevent the jarring behavior of controls going away
-     * while interacting with activity UI.
-     */
-    private final View.OnTouchListener mDelayHideTouchListener = new View.OnTouchListener() {
+
+/*    private final View.OnTouchListener mDelayHideTouchListener = new View.OnTouchListener() {
         @Override
         public boolean onTouch(View view, MotionEvent motionEvent) {
             if (AUTO_HIDE) {
@@ -80,13 +66,38 @@ public class MainActivity extends AppCompatActivity {
             }
             return false;
         }
-    };
+    };*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main);
+
+        //todo: instalar retrofit
+        // fazer o download dos points aqui
+
+        //Download City and points here
+        ArrayList<ARPoint> arPoints = new ArrayList<ARPoint>() {{
+            add(new ARPoint("Pep House", 41.559199, -8.403818, 0));
+            add(new ARPoint("Ponto de Teste", 41.559222, -8.403888, 0));
+            add(new ARPoint("Braga Parque", 41.5580735, -8.4058441, 0));
+            add(new ARPoint("Azambujas House", 41.561128, -8.40956, 0));
+            add(new ARPoint("Hospital", 41.567838, -8.399068, 0));
+        }};
+
+        City braga = new City("braga", arPoints);
+        ArrayList<City> cities = new ArrayList<>();
+        cities.add(braga);
+
+
+        //gravar os mesmos em sharedpreferences
+        for (ARPoint point: braga.getPoints()) {
+            PreferencesHelper.saveObjectInSharedPref(MainActivity.this, point, Constants.SP_POINTS_TAG, braga.getPoints().size());
+        }
+
+
+        //todo: utilizar o get na actividade para a camera e para o mapa
+        //PreferencesHelper.getObjectInSharedPref(this,Constants.SP_POINTS_TAG);
 
         mVisible = true;
         mControlsView = findViewById(R.id.fullscreen_content_controls);
@@ -121,9 +132,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
 
-        // Trigger the initial hide() shortly after the activity has been
-        // created, to briefly hint to the user that UI controls
-        // are available.
         delayedHide(100);
     }
 
@@ -165,10 +173,6 @@ public class MainActivity extends AppCompatActivity {
        // findViewById(R.id.fullscreen_content).setVisibility(View.VISIBLE);
     }
 
-    /**
-     * Schedules a call to hide() in [delay] milliseconds, canceling any
-     * previously scheduled calls.
-     */
     private void delayedHide(int delayMillis) {
         mHideHandler.removeCallbacks(mHideRunnable);
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
