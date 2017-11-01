@@ -91,9 +91,9 @@ public class MainActivity extends AppCompatActivity {
 
 
         //gravar os mesmos em sharedpreferences
-        for (ARPoint point: braga.getPoints()) {
+/*        for (ARPoint point: braga.getPoints()) {
             PreferencesHelper.saveObjectInSharedPref(MainActivity.this, point, Constants.SP_POINTS_TAG, braga.getPoints().size());
-        }
+        }*/
 
 
         //todo: utilizar o get na actividade para a camera e para o mapa

@@ -9,14 +9,21 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.location.Location;
 import android.opengl.Matrix;
+import android.support.annotation.NonNull;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import pt.pepdevils.virtualbraga.R;
 import pt.pepdevils.virtualbraga.helper.LocationHelper;
@@ -34,6 +41,7 @@ public class AROverlayView extends View {
     private Location currentLocation;
     private ArrayList<ARPoint> arPoints;
     private ArrayList<City> cities;
+    private HashMap<Bitmap, HashMap<ARPoint, HashMap<Float, Float>>> bitmaps = new HashMap<>();
 
 
     public AROverlayView(Context context) {
@@ -83,6 +91,7 @@ public class AROverlayView extends View {
         paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
         paint.setTextSize(getResources().getInteger(R.integer.CameraTextSize));
 
+        bitmaps = new HashMap<>();
 
         //para cada cidade
         for (City city : cities) {
@@ -125,6 +134,8 @@ public class AROverlayView extends View {
                     Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), android.R.drawable.ic_delete); //ic_menu_help
                     // example: canvas.drawText(text, x, y, imgPaint);
 
+
+
                     float ffw = bitmap.getWidth();
                     float ffh = bitmap.getHeight();
 
@@ -145,6 +156,16 @@ public class AROverlayView extends View {
 
                     x = (ffw + cameraCoordinateVector[0] / cameraCoordinateVector[3]) * canvas.getWidth();
                     y = (ffh - cameraCoordinateVector[1] / cameraCoordinateVector[3]) * canvas.getHeight();
+
+                   ARPoint pt =  city.getPoints().get(i);
+
+                    HashMap has = new HashMap<Float, Float>();
+                    has.put(x,y);
+
+                    HashMap hass = new HashMap<ARPoint, HashMap<Float, Float>>();
+                    hass.put(pt,has);
+
+                    bitmaps.put(bitmap,hass);
                     canvas.drawBitmap(bitmap, x, y, paint);
 
 
@@ -153,6 +174,65 @@ public class AROverlayView extends View {
 
         }
 
+    }
+
+
+
+    @Override
+    public boolean onTouchEvent(MotionEvent ev) {
+
+        float x = ev.getX();
+        float y = ev.getY();
+
+        switch (ev.getAction()) {
+            case MotionEvent.ACTION_DOWN: {
+
+                for (Map.Entry<Bitmap, HashMap<ARPoint, HashMap<Float, Float>>> entry : bitmaps.entrySet()) {
+                    Bitmap b = entry.getKey();
+                    HashMap<ARPoint, HashMap<Float, Float>> values = entry.getValue();
+
+                    for (Map.Entry<ARPoint, HashMap<Float, Float>> val : values.entrySet()){
+
+                        //depois ir buscar o id do ponto para apresentar um dialog
+                        ARPoint point = val.getKey();
+                        HashMap<Float, Float> floats = val.getValue();
+
+                        for (Map.Entry<Float, Float> fl : floats.entrySet()){
+
+                            float xBit = fl.getKey();
+                            float yBit = fl.getValue();
+
+                            if (x >= xBit && x < (xBit + b.getWidth()) && y >= yBit && y < (yBit + b.getHeight())) {
+                                //tada, if this is true, you've started your click inside your bitmap
+                                Toast.makeText(context, "tocado: " + point.getName(), Toast.LENGTH_SHORT).show();
+                            }
+
+
+                        }
+
+
+
+
+                    }
+
+
+                }
+
+
+                invalidate();
+
+                break;
+            }
+
+            case MotionEvent.ACTION_MOVE: {
+                break;
+            }
+            case MotionEvent.ACTION_UP:
+                break;
+            }
+        return true;
+
+        //return super.onTouchEvent(event);
     }
 
     private String DistanceFromPoint(Location currentLocation, Location location) {
