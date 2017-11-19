@@ -194,7 +194,7 @@ public class AROverlayView extends View {
                     for (Map.Entry<ARPoint, HashMap<Float, Float>> val : values.entrySet()){
 
                         //depois ir buscar o id do ponto para apresentar um dialog
-                        ARPoint point = val.getKey();
+                        final ARPoint point = val.getKey();
                         HashMap<Float, Float> floats = val.getValue();
 
                         for (Map.Entry<Float, Float> fl : floats.entrySet()){
@@ -204,7 +204,32 @@ public class AROverlayView extends View {
 
                             if (x >= xBit && x < (xBit + b.getWidth()) && y >= yBit && y < (yBit + b.getHeight())) {
                                 //tada, if this is true, you've started your click inside your bitmap
-                                Toast.makeText(context, "tocado: " + point.getName(), Toast.LENGTH_SHORT).show();
+                                //todo:create de dialog quando clicar o bitmap, escolher texto ou audio
+
+                                CustomDialogBuilder cdb = CustomDialogBuilder.getInstance(context);
+                                cdb.withTitle("Tile");
+                                cdb.withMessage("See the history in Text or Audio ?");
+                                cdb.withButton1Text("Text");
+                                cdb.setButton1Click(new OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        Toast.makeText(context, "TEXT" +  "tocado: " + point.getName(), Toast.LENGTH_SHORT).show();
+
+                                    }
+                                });
+                                cdb.withButton2Text("Audio");
+                                cdb.setButton2Click(new OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        Toast.makeText(context, "AUDIO" +  "tocado: " + point.getName(), Toast.LENGTH_SHORT).show();
+
+                                    }
+                                });
+                                cdb.isCancelableOnTouchOutside(true);
+                                cdb.show();
+
+
+
                             }
 
 
