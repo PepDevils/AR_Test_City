@@ -1,72 +1,28 @@
 package pt.pepdevils.virtualbraga.activities;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.support.v7.app.ActionBar;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.os.Handler;
-import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
 import pt.pepdevils.virtualbraga.R;
-import pt.pepdevils.virtualbraga.helper.Constants;
-import pt.pepdevils.virtualbraga.helper.PreferencesHelper;
+import pt.pepdevils.virtualbraga.adapters.CustomPagerAdapter;
 import pt.pepdevils.virtualbraga.model.ARPoint;
 import pt.pepdevils.virtualbraga.model.City;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final boolean AUTO_HIDE = true;
-    private static final int AUTO_HIDE_DELAY_MILLIS = 3000;
-    private static final int UI_ANIMATION_DELAY = 300;
-    private final Handler mHideHandler = new Handler();
-    private View mContentView;
-
-    private final Runnable mHidePart2Runnable = new Runnable() {
-        @SuppressLint("InlinedApi")
-        @Override
-        public void run() {
-
-            mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
-                    | View.SYSTEM_UI_FLAG_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
-        }
-    };
-    private View mControlsView;
-    private final Runnable mShowPart2Runnable = new Runnable() {
-        @Override
-        public void run() {
-
-            ActionBar actionBar = getSupportActionBar();
-            if (actionBar != null) {
-                actionBar.show();
-            }
-            mControlsView.setVisibility(View.VISIBLE);
-        }
-    };
-    private boolean mVisible;
-    private final Runnable mHideRunnable = new Runnable() {
-        @Override
-        public void run() {
-            hide();
-        }
-    };
-
-/*    private final View.OnTouchListener mDelayHideTouchListener = new View.OnTouchListener() {
-        @Override
-        public boolean onTouch(View view, MotionEvent motionEvent) {
-            if (AUTO_HIDE) {
-                delayedHide(AUTO_HIDE_DELAY_MILLIS);
-            }
-            return false;
-        }
-    };*/
+    private ViewPager mViewPager;
+    private CustomPagerAdapter mCustomPagerAdapter;
+    private TextView city_name;
+    private int positionViewPagerOverall;
+    private ArrayList<City> cities;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,9 +41,14 @@ public class MainActivity extends AppCompatActivity {
             add(new ARPoint("Hospital", 41.567838, -8.399068, 0));
         }};
 
-        City braga = new City("braga", arPoints);
-        ArrayList<City> cities = new ArrayList<>();
+
+        City braga = new City("braga", arPoints,R.drawable.b);
+        City porto = new City("porto", arPoints,R.drawable.p);
+        City lisboa = new City("lisboa", arPoints,R.drawable.l);
+        cities = new ArrayList<>();
         cities.add(braga);
+        cities.add(porto);
+        cities.add(lisboa);
 
 
         //gravar os mesmos em sharedpreferences
@@ -99,22 +60,15 @@ public class MainActivity extends AppCompatActivity {
         //todo: utilizar o get na actividade para a camera e para o mapa
         //PreferencesHelper.getObjectInSharedPref(this,Constants.SP_POINTS_TAG);
 
-        mVisible = true;
-        mControlsView = findViewById(R.id.fullscreen_content_controls);
-        mContentView = findViewById(R.id.fullscreen_content);
-
-
-        // Set up the user interaction to manually show or hide the system UI.
-        mContentView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                toggle();
-            }
-        });
 
         findViewById(R.id.camera).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                //todo:enviar para a proxima actividade com a cidade certa
+                City c = ChooseCityByPageViewPos(positionViewPagerOverall);
+
+
                 Intent i = new Intent(MainActivity.this, CameraActivity.class);
                 startActivity(i);
             }
@@ -126,55 +80,57 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(i);
             }
         });
+
+
+
+
+
+        city_name = findViewById(R.id.city_name);
+        mCustomPagerAdapter = new CustomPagerAdapter(this, cities);
+
+        // Set up the ViewPager with the sections adapter.
+        mViewPager = findViewById(R.id.container);
+
+        mViewPager.setAdapter(mCustomPagerAdapter);
+
+        //initial state
+        positionViewPagerOverall = mViewPager.getCurrentItem();
+        ChangeCityName(mViewPager.getCurrentItem());
+
+        final Animation expandIn = AnimationUtils.loadAnimation(this, R.anim.animation_pop);
+
+        mViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                city_name.startAnimation(expandIn);
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                ChangeCityName(position);
+                positionViewPagerOverall = position;
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+            }
+        });
+
+
     }
 
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-
-        delayedHide(100);
+    private City ChooseCityByPageViewPos(int positionViewPagerOverall) {
+        return cities.get(positionViewPagerOverall);
     }
 
-    private void toggle() {
-        if (mVisible) {
-            hide();
+    private void ChangeCityName(int position) {
+        if (position == 0) {
+            city_name.setText("LISBOA");
+        } else if (position == 1) {
+            city_name.setText("BRAGA");
         } else {
-            show();
+            city_name.setText("PORTO");
         }
     }
 
-    private void hide() {
-        // Hide UI first
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.hide();
-        }
-        mControlsView.setVisibility(View.GONE);
-        mVisible = false;
-
-        // Schedule a runnable to remove the status and navigation bar after a delay
-        mHideHandler.removeCallbacks(mShowPart2Runnable);
-        mHideHandler.postDelayed(mHidePart2Runnable, UI_ANIMATION_DELAY);
-
-        //findViewById(R.id.fullscreen_content).setVisibility(View.INVISIBLE);
-    }
-
-    @SuppressLint("InlinedApi")
-    private void show() {
-        // Show the system bar
-        mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
-        mVisible = true;
-
-        // Schedule a runnable to display UI elements after a delay
-        mHideHandler.removeCallbacks(mHidePart2Runnable);
-        mHideHandler.postDelayed(mShowPart2Runnable, UI_ANIMATION_DELAY);
-
-       // findViewById(R.id.fullscreen_content).setVisibility(View.VISIBLE);
-    }
-
-    private void delayedHide(int delayMillis) {
-        mHideHandler.removeCallbacks(mHideRunnable);
-        mHideHandler.postDelayed(mHideRunnable, delayMillis);
-    }
 }

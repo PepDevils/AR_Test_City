@@ -9,21 +9,13 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.location.Location;
 import android.opengl.Matrix;
-import android.support.annotation.NonNull;
-import android.text.Layout;
-import android.text.StaticLayout;
-import android.text.TextPaint;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
-
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import pt.pepdevils.virtualbraga.R;
 import pt.pepdevils.virtualbraga.helper.LocationHelper;
@@ -212,7 +204,7 @@ public class AROverlayView extends View {
                                 cdb.withButton1Text("Text");
                                 cdb.setButton1Click(new OnClickListener() {
                                     @Override
-                                    public void onClick(View v) {
+                                    public void onClick(View v) { 
                                         Toast.makeText(context, "TEXT" +  "tocado: " + point.getName(), Toast.LENGTH_SHORT).show();
 
                                     }

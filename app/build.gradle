@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
+    compileSdkVersion 26
     buildToolsVersion '26.0.2'
     //compileOptions.encoding = "ISO-8859-1"
     defaultConfig {
         applicationId "pt.pepdevils.virtualbraga"
         minSdkVersion 21
-        targetSdkVersion 25
+        targetSdkVersion 26
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -27,9 +27,12 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
 */
-    compile 'com.android.support:appcompat-v7:25.3.1'
-    compile 'com.android.support:support-v4:25.3.1'
+    implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation 'com.android.support:design:26.1.0'
+    compile 'com.android.support:support-v4:26.0.0'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
+
+
 
     //para gravar objectos como json em sharedpreferens
     compile 'com.google.code.gson:gson:2.2.4'
